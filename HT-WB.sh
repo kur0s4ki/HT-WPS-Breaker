@@ -932,7 +932,9 @@ Ver_Pckg_Tools() {
                  fi
                  hash airmon-ng 2> /dev/null
                  Aircrack_Suite="$?"
-				 Ver_Reaver=`cat ${Temporary}/Ver_Reaver.txt | grep 'mod by t6_x'`
+				 # Accept any reaver in PATH (stock apt reaver 1.6.x does not print
+				 # 'mod by t6_x' — that banner is only in the old t6x fork).
+				 Ver_Reaver=`command -v reaver`
                  VerMon=`iwconfig 2>&1 | grep 'Mode:Monitor'`
                  VerCar=`iwconfig 2>&1 | grep 'ESSID' | wc -l`
                  Tools_Folder=`ls -l | grep -E 'Tools$' | grep -E '^d'`

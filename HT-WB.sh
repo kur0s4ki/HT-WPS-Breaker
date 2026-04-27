@@ -2215,7 +2215,9 @@ case $menu in
 						       exit_function
 						   fi
 						   trap kill_wash SIGINT
-						   wash -i $mon -C -o ${Temporary}/wash.txt > /dev/null &
+						   # wash 1.6.x dropped `-o <file>` and renamed `-C` to `-F`.
+						   # Redirect stdout to the scan-log file so the parser below still works.
+						   wash -i $mon -F > ${Temporary}/wash.txt 2>/dev/null &
 						   WashID="$!"
 						   disown $WashID
 						   for ((c=0; c<=3; c++))

@@ -905,6 +905,21 @@ Installation() {
                 echo ""
 }
 Ver_Pckg_Tools() {
+                 # Auto-install missing tools via apt (modern Debian/Kali/Ubuntu).
+                 # The reaver package provides both `reaver` and `wash`.
+                 if command -v apt-get >/dev/null 2>&1 && [ "$(id -u)" -eq 0 ]; then
+                     Missing_Pkgs=""
+                     command -v wash         >/dev/null 2>&1 || Missing_Pkgs="$Missing_Pkgs reaver"
+                     command -v reaver       >/dev/null 2>&1 || Missing_Pkgs="$Missing_Pkgs reaver"
+                     command -v pixiewps     >/dev/null 2>&1 || Missing_Pkgs="$Missing_Pkgs pixiewps"
+                     command -v aircrack-ng  >/dev/null 2>&1 || Missing_Pkgs="$Missing_Pkgs aircrack-ng"
+                     Missing_Pkgs=$(echo $Missing_Pkgs | tr ' ' '\n' | sort -u | tr '\n' ' ')
+                     if [ -n "$(echo $Missing_Pkgs | tr -d ' ')" ]; then
+                         echo -e "$White [${Yellow}*${White}] Installing missing tools via apt:${Green}$Missing_Pkgs${White}"
+                         apt-get update -qq >/dev/null 2>&1
+                         apt-get install -y $Missing_Pkgs >/dev/null 2>&1
+                     fi
+                 fi
 	             reaver 2&> ${Temporary}/Ver_Reaver.txt 2> /dev/null
                  hash pixiewps 2> /dev/null
                  Ver_Pixiewps="$?"
@@ -2190,6 +2205,13 @@ case $menu in
                  if [ "$VerMon" != "" ]
                       then
                            Ver_Mon_Fun
+						   if ! command -v wash >/dev/null 2>&1; then
+						       echo ""
+						       echo -e "$White [${Red}!${White}] ${Red}wash${White} is not installed. Install it with:"
+						       echo -e "${Yellow}     sudo apt update && sudo apt install -y reaver aircrack-ng pixiewps${White}"
+						       echo -e "$White     (the${Green} reaver${White} package provides${Green} wash${White}.)"
+						       exit_function
+						   fi
 						   trap kill_wash SIGINT
 						   wash -i $mon -C -o ${Temporary}/wash.txt > /dev/null &
 						   WashID="$!"
